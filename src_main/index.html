@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>Spring Boot Thymeleaf Hello World Example</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+<link rel="stylesheet" th:href="@{/css/main.css}"
+	href="../../css/main.css" />
+
+<link rel="stylesheet" th:href="@{/lib/chartis/chartist.min.css}"
+	href="../../lib/chartis/chartist.min.css" />
+<!-- /.container -->
+<script type="text/javascript" src="webjars/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript"
+	src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../../lib/chartis/chartist.min.js"></script>
+</head>
+<body>
+
+	<nav class="navbar navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Spring Boot</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#">Home</a></li>
+					<li><a href="#about">About</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+
+		<div class="starter-template">
+			<h1>InteligentPot minimalistic</h1>
+			<table>
+				<tr>
+					<td>
+						<form id="run" method="GET" th:action="@{/motor/run}">
+							<button id="bRun" type="button" class="btn btn-primary"
+								name="submit" value="value">RUN</button>
+						</form>
+					</td>
+					<td>
+						<form id="stop" method="GET" th:action="@{/motor/stop}">
+							<button id="bStop" type="button" class="btn btn-primary"
+								name="submit" value="value">STOP</button>
+						</form>
+					</td>
+					<td>
+						<img id="motorState" src="img/red.jpg" style="width:100px"></img>
+						<script th:inline="javascript">
+							/*<![CDATA[*/
+			
+							var motorState = /*[[${motorState}]]*/'false';
+							if(motorState == true){
+								document.getElementById('motorState').src='img/green.jpg';
+							}else{
+								document.getElementById('motorState').src='img/red.jpg';
+							}
+			
+							/*]]>*/
+						</script>
+					</td>
+				</tr>
+			</table>
+			<div class="ct-chart ct-golden-section" id="chart1"></div>
+			<script th:inline="javascript">
+				function sendRequest(e, formElement) {
+					$.get(formElement.attr("action"), function(data) {
+						console.log(data)
+					});
+					e.preventDefault();
+				}
+				$(function() {
+					$('#bStop').click(function(e) {
+						sendRequest(e, $("#stop"));
+						document.getElementById('motorState').src='img/red.jpg';
+					});
+					$('#bRun').click(function(e) {
+						sendRequest(e, $("#run"));
+						document.getElementById('motorState').src='img/green.jpg';
+					});
+				});
+			</script>
+			<script th:inline="javascript">
+				/*<![CDATA[*/
+
+				var message = /*[[${message}]]*/'default';
+
+				var data = /*[[(${data})]]*/[ 0, 0, 0, 0 ];
+
+				/*]]>*/
+			</script>
+			<script th:inline="javascript">
+				/*<![CDATA[*/
+				var tempArray = [];
+				var moistureArray = [];
+				var dates = [];
+				for ( var dl in data) {
+					tempArray.push(data[dl]["temp"]);
+					moistureArray.push(data[dl]["moisture"]);
+					dates.push(data[dl]["date"]["dayOfMonth"]);
+				}
+
+				// Initialize a Line chart in the container with the ID chart1
+				new Chartist.Line('.ct-chart',{
+					labels : dates,
+					series : [ {value:tempArray},{value:moistureArray}  ]
+				}, {
+					fullWidth: true,
+					  chartPadding: {
+					    right: 40
+					  },
+				});
+				/*]]>*/
+			</script>
+		</div>
+
+	</div>
+
+
+</body>
+</html>
